@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    <title>初学WINAPI笔记：Hello World | I-m-Eden</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link rel="stylesheet" href="/libs/fancybox/jquery.fancybox.css" charset="utf-8">
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="site">
+    <header class="site-header">
+        <h1 class="site-title"><a href="/">I-m-Eden</a></h1>
+        <nav class="site-nav">
+            <ul class="nav">
+                
+                <li><a href="/archives">Archives</a></li>
+                
+                <li><a href="/about">About</a></li>
+                
+                
+                <li><a class="toggle-search" href="#search">search</a></li>
+            </ul>
+        </nav>
+        <div class="site-search" id="search">
+            <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+        
+            <div class="site-header-background" style="background-image:url(https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-90382.jpg)"></div>
+        
+    </header>
+    <div class="site-body">
+        <div class="global-width">
+    <article class="article" data-layout="post" data-slug="note-winapi-2">
+        <div class="article-content">
+            
+            
+            <header class="article-header">
+                <div class="article-meta">
+                    <a href="/2018/02/09/note-winapi-2/" class="article-date">
+  <time datetime="2018-02-09T05:45:51.000Z">2018-02-09</time>
+</a>
+                    
+                    
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/notes/">notes</a></li></ul>
+
+                </div>
+                
+    <h1 class="article-title" itemprop="name">
+      <a href="/2018/02/09/note-winapi-2/">初学WINAPI笔记：Hello World</a>
+    </h1>
+
+            </header>
+            
+            <div class="article-body">
+                <h3 id="句柄"><a href="#句柄" class="headerlink" title="句柄"></a>句柄</h3><p>句柄是整个windows编程的基础<br>一个句柄是指<strong>使用</strong>的一个唯一的整数值，即一个4字节(64位程序中为8字节)长的数值，<br>来<strong>标识</strong>应用程序中的不同对象和同类对象中的不同的实例<br>诸如，一个窗口，按钮，图标，滚动条，输出设备，控件或者文件等。<br>应用程序能够通过句柄访问相应的对象的信息。<br>Windows使用了大量的句柄来标识很多对象。<br>（来自百度百科）</p>
+<hr>
+<h3 id="WinMain"><a href="#WinMain" class="headerlink" title="WinMain"></a>WinMain</h3><p>注意先协商头文件<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;Windows.h&gt;</span></span></span><br></pre></td></tr></table></figure></p>
+<p>然后是WinMain<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> WINAPI <span class="title">WinMain</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">	HINSTANCE hInstance,	<span class="comment">//应用程序当前实例的句柄</span></span></span></span><br><span class="line"><span class="function"><span class="params">	HINSTANCE hPrevinstance,<span class="comment">//应用程序的先前实例的句柄</span></span></span></span><br><span class="line"><span class="function"><span class="params">	LPSTR lpCmdline,	<span class="comment">//指向应用程序命令行的字符串的指针</span></span></span></span><br><span class="line"><span class="function"><span class="params">	<span class="keyword">int</span> nCmdshow		<span class="comment">//窗口如何显示</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span></span><br></pre></td></tr></table></figure></p>
+<p><strong>hInstance</strong> 应用程序当前实例的句柄<br><strong>hPrevinstance</strong> 应用程序的先前实例的句柄<br>如果同一个程序打开两次，出现两个窗口，那么第一次打开的窗口就是先前实例的窗口。对于一个32位程序，该参数总为NULL（来自百度百科）<br>所以如果要防止程序打开两次，可以写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (hPrevinstance) &#123;</span><br><span class="line">	MessageBox(<span class="literal">NULL</span>,<span class="string">"应用程序已在运行"</span>,<span class="string">"注意"</span>,MB_OK);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>lpCmdline</strong> 类型名是是LPSTR，即char*。是指向应用程序命令行的字符串的指针。<br>例如在命令行中输入:notepad D:\1.txt；<br>或是双击这个文件启动记事本程序notepad.exe时，<br>系统会将”D:\1.txt”字符串作为命令行参数(lpCmdline)传递给记事本程序的WinMain函数。<br>然后在窗口中显示该文件内容。<br><strong>nCmdshow</strong> 指明窗口如何显示。如最小化SW_SHOWMINIMIZED，不变SW_SHOW，最大化SW_SHOWMAXIMIZED等。</p>
+<hr>
+<h3 id="注册窗口类"><a href="#注册窗口类" class="headerlink" title="注册窗口类"></a>注册窗口类</h3><p>如果我们写一个函数:MyRegisterClass(hInstance)，若返回值为0，那么注册失败。<br>那么可以写如下代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!MyRegisterClass(hInstance)) &#123;</span><br><span class="line">	MessageBox(<span class="literal">NULL</span>, <span class="string">"注册窗口失败"</span>, <span class="string">"错误"</span>, MB_OK);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>问题在于怎么注册窗口类。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//WNDCLASSEX定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagWNDCLASSEXA</span> &#123;</span></span><br><span class="line">    UINT        cbSize;		<span class="comment">//该结构字节数</span></span><br><span class="line">    <span class="comment">/* Win 3.x */</span></span><br><span class="line">    UINT        style; 		<span class="comment">//窗口类风格</span></span><br><span class="line">    WNDPROC     lpfnWndProc;	<span class="comment">//长指针，指向回调函数WndProc。DispatchMessage将把消息发给这个函数</span></span><br><span class="line">    <span class="keyword">int</span>         cbClsExtra;	<span class="comment">//不清楚</span></span><br><span class="line">    <span class="keyword">int</span>         cbWndExtra;	<span class="comment">//不清楚</span></span><br><span class="line">    HINSTANCE   hInstance;	<span class="comment">//当前模块的实例句柄</span></span><br><span class="line">    HICON       hIcon;		<span class="comment">//窗口图标的句柄</span></span><br><span class="line">    HCURSOR     hCursor;	<span class="comment">//鼠标指针的句柄</span></span><br><span class="line">    HBRUSH      hbrBackground;	<span class="comment">//绘制窗口背景的画刷的句柄</span></span><br><span class="line">    LPCSTR      lpszMenuName;	<span class="comment">//窗口菜单的资源ID字符串</span></span><br><span class="line">    LPCSTR      lpszClassName;	<span class="comment">//窗口类的名称（之后与CreateWindowEx联系上）</span></span><br><span class="line">    <span class="comment">/* Win 4.0 */</span></span><br><span class="line">    HICON       hIconSm;	<span class="comment">//窗口小图标的句柄</span></span><br><span class="line">&#125; WNDCLASSEXA;</span><br><span class="line"><span class="keyword">typedef</span> WNDCLASSEXA WNDCLASSEX;</span><br></pre></td></tr></table></figure></p>
+<p>注册窗口类的过程：MyRegisterClass代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> CLASSNAME[] = <span class="string">"helloworld"</span>;		<span class="comment">//窗口类的名称</span></span><br><span class="line"><span class="function">ATOM <span class="title">MyRegisterClass</span><span class="params">(HINSTANCE hInstance)</span> </span>&#123; 	<span class="comment">//ATOM和WORD等价，hInstance是当前实例句柄</span></span><br><span class="line">	WNDCLASSEX wcex; <span class="comment">//窗口类</span></span><br><span class="line">	wcex.cbSize = <span class="keyword">sizeof</span>(WNDCLASSEX);</span><br><span class="line">	wcex.style = CS_HREDRAW | CS_VREDRAW;	<span class="comment">//当窗口水平方向、垂直方向宽度改变时，重绘窗口</span></span><br><span class="line">	wcex.lpfnWndProc = WndProc;		<span class="comment">//指向回调函数</span></span><br><span class="line">	wcex.cbClsExtra = <span class="number">0</span>;</span><br><span class="line">	wcex.cbWndExtra = <span class="number">0</span>;</span><br><span class="line">	wcex.hInstance = hInstance;		<span class="comment">//当前实例的句柄</span></span><br><span class="line">	wcex.hIcon = LoadIcon(<span class="literal">NULL</span>, IDI_APPLICATION);		<span class="comment">//加载系统图标</span></span><br><span class="line">	wcex.hCursor = LoadCursor(<span class="literal">NULL</span>, IDC_ARROW);		<span class="comment">//加载系统鼠标指针</span></span><br><span class="line">	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);<span class="comment">//绘制窗口背景时用白色画刷</span></span><br><span class="line">	wcex.lpszMenuName = <span class="literal">NULL</span>;				<span class="comment">//没有菜单</span></span><br><span class="line">	wcex.lpszClassName = CLASSNAME;		<span class="comment">//窗口类的名称（之后与CreateWindowEx联系上）</span></span><br><span class="line">	wcex.hIconSm = LoadIcon(<span class="literal">NULL</span>, IDI_APPLICATION);</span><br><span class="line">	<span class="keyword">return</span> RegisterClassEx(&amp;wcex);		<span class="comment">//注册窗口类。失败时返回0。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这一段代码不太好记。<br>写的时候一般依靠VS2017的速览定义，查看WNDCLASSEX的每一个变量。<br>通常我复制粘贴这一段代码O(∩_∩)O</p>
+<hr>
+<h3 id="创建、显示、刷新窗口"><a href="#创建、显示、刷新窗口" class="headerlink" title="创建、显示、刷新窗口"></a>创建、显示、刷新窗口</h3><p>创建窗口之后，你得到了窗口句柄。<br>类型：HWND<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//来自CSDN某博客</span></span><br><span class="line"><span class="function">HWND <span class="title">CreateWindowEx</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        DWORD    dwExStyle,    <span class="comment">//窗口的扩展风格</span></span></span></span><br><span class="line"><span class="function"><span class="params">      LPCTSTR    lpClassName,  <span class="comment">//已经注册的窗口类名称</span></span></span></span><br><span class="line"><span class="function"><span class="params">      LPCTSTR    lpWindowName, <span class="comment">//窗口标题栏的名字</span></span></span></span><br><span class="line"><span class="function"><span class="params">        DWORD    dwStyle,    <span class="comment">//窗口的基本风格</span></span></span></span><br><span class="line"><span class="function"><span class="params">          <span class="keyword">int</span>    x,          <span class="comment">//窗口左上角水平坐标位置</span></span></span></span><br><span class="line"><span class="function"><span class="params">          <span class="keyword">int</span>    y,          <span class="comment">//窗口左上角垂直坐标位置</span></span></span></span><br><span class="line"><span class="function"><span class="params">          <span class="keyword">int</span>    nWidth,     <span class="comment">//窗口的宽度</span></span></span></span><br><span class="line"><span class="function"><span class="params">          <span class="keyword">int</span>    nHeight,    <span class="comment">//窗口的高度</span></span></span></span><br><span class="line"><span class="function"><span class="params">         HWND    hWndParent, <span class="comment">//窗口的父窗口句柄</span></span></span></span><br><span class="line"><span class="function"><span class="params">        HMENU    hMenu,      <span class="comment">//窗口菜单句柄</span></span></span></span><br><span class="line"><span class="function"><span class="params">    HINSTANCE    hInstance,  <span class="comment">//应用程序实例句柄</span></span></span></span><br><span class="line"><span class="function"><span class="params">       LPVOID    lpParam     <span class="comment">//窗口创建时附加参数   </span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>; <span class="comment">//创建成功返回窗口句柄</span></span><br></pre></td></tr></table></figure></p>
+<p>代码如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> TITLE[] = <span class="string">"Hello World"</span>;		<span class="comment">//窗口名称</span></span><br><span class="line">HWND hwnd = CreateWindowEx(	</span><br><span class="line">	<span class="literal">NULL</span>, </span><br><span class="line">	CLASSNAME, 		<span class="comment">//此处的CLASSNAME与之前注册窗口类时的CLASSNAME对应。</span></span><br><span class="line">	TITLE,			<span class="comment">//窗口标题栏名字</span></span><br><span class="line">	WS_OVERLAPPEDWINDOW | WS_VISIBLE,	<span class="comment">//窗口风格：层叠式可见窗口</span></span><br><span class="line">	CW_USEDEFAULT, </span><br><span class="line">	CW_USEDEFAULT,		<span class="comment">//左上角位置为默认值</span></span><br><span class="line">	<span class="number">640</span>, </span><br><span class="line">	<span class="number">480</span>,			<span class="comment">//窗口大小为640*480</span></span><br><span class="line">	<span class="literal">NULL</span>, </span><br><span class="line">	<span class="literal">NULL</span>, </span><br><span class="line">	hInstance,		<span class="comment">//当前的实例句柄 </span></span><br><span class="line">	<span class="literal">NULL</span></span><br><span class="line">);				<span class="comment">//窗口句柄诞生了！</span></span><br><span class="line">ShowWindow(hwnd, nCmdshow);	<span class="comment">//以nCmdshow的形式显示窗口</span></span><br><span class="line">UpdateWindow(hwnd);		<span class="comment">//刷新窗口</span></span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="消息循环"><a href="#消息循环" class="headerlink" title="消息循环"></a>消息循环</h3><p>消息循环有3个重要的函数：</p>
+<p><strong>BOOL PeekMessage(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT wRemoveMsg);</strong><br>PeekMesssge只得到那些与参数<strong>hWnd</strong>标识的窗口相联系的消息或被lsChild确定为其子窗口相联系的消息，<br>并且该消息要在由参数<strong>wMsgFilterMin</strong>和<strong>wMsgFilherMax</strong>确定的范围内。<br>如果<strong>hWnd</strong>为NULL，则PeekMessage接收属于当前调用线程的窗口的消息（PeekMessage不接收属于其他线程的窗口的消息）。<br>如果<strong>wMsgFilterMin</strong>和<strong>wMsgFilterMax</strong>都为零，PeekMessage返回所有可得的消息（即，无范围过滤）。<br>当系统<strong>无消息时，返回FALSE</strong>，继续执行后续代码<br>如果<strong>wRemoveMsg</strong>的值是PM_REMOVE，那么取出的消息不会放回消息队列中。</p>
+<p><strong>BOOL TranslateMessage(CONST MSG *lpMsg);</strong><br>该函数将虚拟键消息转换为字符消息。字符消息被寄送到调用线程的消息队列里，<br>当下一次线程调用函数GetMessage或PeekMessage时字符消息被取出。</p>
+<p><strong>LONG DispatchMessage(CONST MSG *lpMsg)</strong><br>消息传递给操作系统，然后操作系统去调用我们的回调函数<br>（以上文字来自百度百科）</p>
+<p>上一次的笔记给出的伪代码写了消息循环的过程。<br>以下为详细代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">	MSG msg = &#123; <span class="number">0</span> &#125;; <span class="comment">//清空</span></span><br><span class="line">	<span class="keyword">if</span> (PeekMessage(&amp;msg, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, PM_REMOVE)) &#123; <span class="comment">//取出消息</span></span><br><span class="line">		TranslateMessage(&amp;msg);</span><br><span class="line">		DispatchMessage(&amp;msg);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (msg.message == WM_QUIT)<span class="keyword">break</span>; <span class="comment">//如果消息是Quit，退出消息循环</span></span><br><span class="line">	Sleep(<span class="number">1</span>); <span class="comment">//延迟函数，使CPU占用率降低</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="回调函数WndProc"><a href="#回调函数WndProc" class="headerlink" title="回调函数WndProc"></a>回调函数WndProc</h3><p><strong>LRESULT CALLBACK WndProc(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam);</strong><br>CALLBACK:即回调函数，等价于__stdcall，<br>WndProc有4个参数。<br><strong>hwnd</strong>:当前窗口句柄<br><strong>umsg</strong>:消息ID<br><strong>wparam</strong>,<strong>lparam</strong>:消息的参数（附加在消息上的数据）</p>
+<p>其中umsg的值可以是<br>WM_PAINT、WM_SIZE、WM_DESTROY、WM_KEYDOWN等等（所有WM开头的）</p>
+<p>当值为<strong>WM_DESTROY</strong>，意味着窗口被摧毁，但进程还存在。<br>所以要进行PostQuitMessage(0);发送Quit消息。<br>当接收到WM_QUIT消息后，消息队列就不再有消息了。</p>
+<p>当值为<strong>WM_PAINT</strong>时，表示窗口需要重新绘制了。<br>这个消息的触发条件是：程序启动时，用鼠标调整窗口的大小，从最小化还原时，最大化时，使用InvalidateRect函数时，等等。</p>
+<p>如果要绘制，需要先<strong>BeginPaint(hwnd,&amp;paintstruct)</strong>，<br>即为指定窗口hwnd进行绘图工作的准备，并用将和绘图有关的信息填充到一个叫PAINTSTRUCT的结构中<br>BeginPaint的返回值是：<br>(HDC)指定窗口的“显示设备描述表”句柄。<br>这个句柄在绘图时需要用到。<br>如果我们要输出”Hello World”，一个简单的画字函数：<br><strong>TextOut(HDC,x,y,text,strlen(text))</strong>就能绘制text这个字符串。<br>HDC是之前BeginPaint返回的句柄，x,y是绘制的字符串的左上角坐标。<br><strong>EndPaint(hwnd,&amp;paintstruct)</strong>是结束绘图。</p>
+<p>WndProc最后要<strong>return DefWindowProc(hwnd, umsg, wparam, lparam)</strong>，<br>表示将消息交给系统处理。<br>WndProc代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LRESULT CALLBACK <span class="title">WndProc</span><span class="params">(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">switch</span> (umsg) &#123;</span><br><span class="line">	<span class="keyword">case</span> WM_PAINT: &#123; <span class="comment">//需要进行绘图的消息</span></span><br><span class="line">		PAINTSTRUCT pt; </span><br><span class="line">		HDC hdc = BeginPaint(hwnd, &amp;pt);	<span class="comment">//准备</span></span><br><span class="line">		<span class="keyword">char</span> text[] = <span class="string">"Hello World"</span>;		<span class="comment">//字符串</span></span><br><span class="line">		TextOut(hdc, <span class="number">275</span>, <span class="number">200</span>, text, <span class="built_in">strlen</span>(text));	<span class="comment">//在显示设备hdc上画字符串</span></span><br><span class="line">		EndPaint(hwnd, &amp;pt);			<span class="comment">//结束</span></span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">case</span> WM_DESTROY: PostQuitMessage(<span class="number">0</span>); <span class="keyword">break</span>;	<span class="comment">//发送Quit消息</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> DefWindowProc(hwnd, umsg, wparam, lparam);	<span class="comment">//把消息交给系统处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="那么我们的HelloWorld程序就完成了！"><a href="#那么我们的HelloWorld程序就完成了！" class="headerlink" title="那么我们的HelloWorld程序就完成了！"></a>那么我们的HelloWorld程序就完成了！</h3><p><strong>运行结果：</strong><br><img src="/2018/02/09/note-winapi-2/pic.png" alt="截图"><br><strong>编程环境：VS2017</strong><br><strong>源代码下载：<a href="helloworld.zip">helloworld.zip</a></strong></p>
+<p><strong>WINAPI手册下载：<a href="Win32 API.chm">Win32 API.chm</a></strong></p>
+
+            </div>
+        </div>
+    </article>
+
+    
+    
+<nav class="article-nav">
+  
+  
+    <a href="/2018/02/09/note-winapi-1/" id="article-nav-older" class="article-nav-link-wrap next">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">初学WINAPI笔记：介绍</div>
+    </a>
+  
+</nav>
+
+    
+
+    
+</div>
+    </div>
+    <footer class="site-footer">
+        <div class="global-width">
+            <ul class="site-widget">
+                
+                <li class="widget widget-tag">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Notes/">Notes</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/notes/">notes</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+                </li>
+                
+                <li class="widget widget-category">
+                    
+                </li>
+                
+                <li class="widget widget-recent_posts">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-body">
+      <ul>
+        
+          <li>
+            <a href="/2018/02/09/note-winapi-2/">初学WINAPI笔记：Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/09/note-winapi-1/">初学WINAPI笔记：介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/06/ST-PUZZLE-1-0/">ST_PUZZLE_1.0 （一个益智游戏）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/tooldownload/">tool download （工具下载）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/I-m-Eden/">I-m-Eden （关于这个博客）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+                </li>
+                
+            </ul>
+        </div>
+        <div class="site-info">
+            <address>
+                &copy; 2014 <a href="http://yoursite.com">I-m-Eden</a> All Right Reserved. <br/>
+                Powered by <a href="http://hexo.io">Hexo</a>. Theme by <a href="http://zzoman.com">ZZOMAN</a>
+            </address>
+        </div>
+    </footer>
+    
+    <script src="/libs/jquery-1.11.3.min.js" type="text/javascript"></script>
+    
+    <script src="/libs/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    
+    <script src="/js/site_init.js" type="text/javascript"></script>
+    
+</body>
+</html>
