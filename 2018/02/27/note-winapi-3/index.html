@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    <title>初学WINAPI笔记：绘图 | I-m-Eden</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link rel="stylesheet" href="/libs/fancybox/jquery.fancybox.css" charset="utf-8">
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body class="site">
+    <header class="site-header">
+        <h1 class="site-title"><a href="/">I-m-Eden</a></h1>
+        <nav class="site-nav">
+            <ul class="nav">
+                
+                <li><a href="/archives">Archives</a></li>
+                
+                <li><a href="/about">About</a></li>
+                
+                
+                <li><a class="toggle-search" href="#search">search</a></li>
+            </ul>
+        </nav>
+        <div class="site-search" id="search">
+            <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+        </div>
+        
+            <div class="site-header-background" style="background-image:url(https://wallpapers.wallhaven.cc/wallpapers/full/wallhaven-90382.jpg)"></div>
+        
+    </header>
+    <div class="site-body">
+        <div class="global-width">
+    <article class="article" data-layout="post" data-slug="note-winapi-3">
+        <div class="article-content">
+            
+            
+            <header class="article-header">
+                <div class="article-meta">
+                    <a href="/2018/02/27/note-winapi-3/" class="article-date">
+  <time datetime="2018-02-27T04:37:47.000Z">2018-02-27</time>
+</a>
+                    
+                    
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/notes/">notes</a></li></ul>
+
+                </div>
+                
+    <h1 class="article-title" itemprop="name">
+      <a href="/2018/02/27/note-winapi-3/">初学WINAPI笔记：绘图</a>
+    </h1>
+
+            </header>
+            
+            <div class="article-body">
+                <p>这一篇笔记写了三块内容：<br>1.窗口大小？绘图区域大小？<br>2.画笔和画刷，绘制几何图形<br>3.双缓冲区绘图</p>
+<h3 id="窗口大小？绘图区域大小？"><a href="#窗口大小？绘图区域大小？" class="headerlink" title="窗口大小？绘图区域大小？"></a>窗口大小？绘图区域大小？</h3><p>以下是创建窗体的函数<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HWND hwnd = CreateWindowEx(</span><br><span class="line">	<span class="literal">NULL</span>,</span><br><span class="line">	CLASSNAME, TITLE,</span><br><span class="line">	WS_OVERLAPPEDWINDOW | WS_VISIBLE,</span><br><span class="line">	CW_USEDEFAULT, CW_USEDEFAULT, <span class="number">640</span>, <span class="number">400</span>,</span><br><span class="line">	<span class="literal">NULL</span>, <span class="literal">NULL</span>, hInstance, <span class="literal">NULL</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>其中640, 480表示的是窗口大小，而不是绘图区域的大小。<br>所以当你画一条从(0,0)到(640,480)的线时，会发现画出的线并不是对角线。<br>这时候需要一个叫<strong>AdjustWindowRectEx</strong>的函数<br><strong>函数原型</strong>：<br>BOOL AdjustWindowRectEX(LPRECT lpRect, DWORD dwStyte, BOOL bMenu, DWORD dwExStyle);<br><strong>函数功能</strong>：<br>该函数依据所需客户矩形大小，计算需要的窗口矩形的大小。计算出的窗口矩形随后可以传送给CreateWindowEx函数，用于创建一个客户区所需大小的窗口。<br>lpRect：指向RECT结构的指针，该结构包含所需客户区域的左上角和右下角的坐标。函数返回时，该结构包含容纳所需客户区域的窗口的左上角和右下角的坐标。<br>dwStyle：指定将被计算尺寸的窗口的窗口风格。<br>bMenu：指示窗口是否有菜单。<br>dwExStyle：指定将被计算尺寸的窗口的扩展窗口风格。</p>
+<p>所以创建窗体的代码，可以这样写：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">RECT rect = &#123; <span class="number">0</span>, <span class="number">0</span>, <span class="number">640</span>, <span class="number">480</span> &#125;;</span><br><span class="line">AdjustWindowRectEx(&amp;rect, WS_OVERLAPPEDWINDOW | WS_VISIBLE, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">HWND hwnd = CreateWindowEx(</span><br><span class="line">	<span class="literal">NULL</span>,</span><br><span class="line">	CLASSNAME, TITLE,</span><br><span class="line">	WS_OVERLAPPEDWINDOW | WS_VISIBLE,</span><br><span class="line">	CW_USEDEFAULT, CW_USEDEFAULT, rect.right-rect.left, rect.bottom-rect.top,</span><br><span class="line">	<span class="literal">NULL</span>, <span class="literal">NULL</span>, hInstance, <span class="literal">NULL</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h3 id="画笔和画刷，绘制几何图形"><a href="#画笔和画刷，绘制几何图形" class="headerlink" title="画笔和画刷，绘制几何图形"></a>画笔和画刷，绘制几何图形</h3><p>由于WM_PAINT消息只有在少数情况下才会产生，所以在WM_PAINT里面绘图无法实现一些动画效果（连续地作图）<br>所以，我们可以在消息循环的while函数中绘图。<br>与在WndProc中的绘图不同，这时我们不能用beginpaint来获取设备描述表句柄。<br>我们采用的是 <strong>HDC hdc = GetDC(hwnd);</strong><br>同时endpaint函数要改成 <strong>ReleaseDC(hwnd, hdc);</strong><br>这样绘图还有些问题，之后会想办法解决。</p>
+<h4 id="1-画线"><a href="#1-画线" class="headerlink" title="1.画线"></a>1.画线</h4><p>众所周知，一条线有三个信息：线类型、线宽、线颜色。<br>可以使用 <strong>HPEN CreatePen( int iStyle, int cWidth, COLORREF color)</strong> 获取这样的<strong>画笔的句柄</strong>。<br>返回值：画笔的句柄：HPEN<br>值得注意的是，istyle是线的风格，cwidth是线的宽度<br>istyle=0时线是实线，istyle&gt;1时线有各式各样的风格。<br>而只有当cwidth=1的时候（即线的宽度为1），istyle才能取&gt;1的值。</p>
+<p>当然，得到了这个画笔句柄还不够，还要把这个画笔选择到设备描述表（DC）中。<br>所以，需要使用 <strong>HGDIOBJ SelectObject( HDC hdc, HGDIOBJ h)</strong> 函数<br>其中，hdc是设备描述表句柄。h是要选择的句柄。<br>返回值是与该句柄类型相同的旧句柄。而该旧句柄已经被新句柄替换掉了。</p>
+<p>选择该句柄之后，开始画线了。<br>画线需要两个函数：<br><strong>MoveToEx(hdc, x1, y1, NULL);</strong> //将当前绘图位置移动到(x1,y1)。<br><strong>LineTo(hdc, x2, y2);</strong> //用当前画笔画一条线，从当前绘图位置连到点(x2,y2)。<br>这两个函数表示，用画笔从(x1,y1)连线到(x2,y2)。</p>
+<p>这样真的就结束了吗？<br>大家可以写一个程序。在消息循环中加入以下绘图代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HDC hdc = GetDC(hwnd);</span><br><span class="line">HPEN hpen = CreatePen(<span class="number">1</span>, <span class="number">3</span>, RGB(rand()%<span class="number">256</span>,rand()%<span class="number">256</span>,rand()%<span class="number">256</span>));</span><br><span class="line">SelectObject(hdc, hpen);</span><br><span class="line">MoveToEx(hdc, <span class="number">0</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">LineTo(hdc, <span class="number">640</span>, <span class="number">480</span>);</span><br><span class="line">ReleaseDC(hwnd, hdc);</span><br></pre></td></tr></table></figure></p>
+<p>乍一看这代码没有问题，但是绘图一段时间之后，颜色不再变化。<br>我们查询一下百度百科，发现：<br>“当不再需要画笔后，要释放CreatePen创建出来的画笔（特别是在一直使用这个函数创建画笔的时候）的资源，用DeleteObject函数。”<br>于是我们尝试一下，在代码的最后面加上 <strong>DeleteObject(hpen)</strong>，<br>奇迹般地发现，bug消失了。</p>
+
+            </div>
+        </div>
+    </article>
+
+    
+    
+<nav class="article-nav">
+  
+  
+    <a href="/2018/02/09/note-winapi-2/" id="article-nav-older" class="article-nav-link-wrap next">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">初学WINAPI笔记：Hello World</div>
+    </a>
+  
+</nav>
+
+    
+
+    
+</div>
+    </div>
+    <footer class="site-footer">
+        <div class="global-width">
+            <ul class="site-widget">
+                
+                <li class="widget widget-tag">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/About/">About</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/notes/">notes</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/program/">program</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tool/">tool</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+                </li>
+                
+                <li class="widget widget-category">
+                    
+                </li>
+                
+                <li class="widget widget-recent_posts">
+                    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-body">
+      <ul>
+        
+          <li>
+            <a href="/2018/02/27/note-winapi-3/">初学WINAPI笔记：绘图</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/09/note-winapi-2/">初学WINAPI笔记：Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/09/note-winapi-1/">初学WINAPI笔记：介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/06/ST-PUZZLE-1-0/">ST_PUZZLE_1.0 （一个益智游戏）</a>
+          </li>
+        
+          <li>
+            <a href="/2018/02/05/tooldownload/">tool download （工具下载）</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+                </li>
+                
+            </ul>
+        </div>
+        <div class="site-info">
+            <address>
+                &copy; 2014 <a href="http://yoursite.com">I-m-Eden</a> All Right Reserved. <br/>
+                Powered by <a href="http://hexo.io">Hexo</a>. Theme by <a href="http://zzoman.com">ZZOMAN</a>
+            </address>
+        </div>
+    </footer>
+    
+    <script src="/libs/jquery-1.11.3.min.js" type="text/javascript"></script>
+    
+    <script src="/libs/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    
+    <script src="/js/site_init.js" type="text/javascript"></script>
+    
+</body>
+</html>
